@@ -36,5 +36,5 @@ async def upload(file: UploadFile = File(...)):
     return {"success": True, "file_path": f"/videos/{file_name}.{file_ext}", "message": "File upload successful"}
 
 if __name__ == "__main__":
-    uvicorn.run(app, host="0.0.0.0", port=8000, reload=True) 
+    uvicorn.run(app, host="0.0.0.0", port=10000, reload=True) 
 
