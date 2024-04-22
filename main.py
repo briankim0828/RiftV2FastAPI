@@ -1,4 +1,5 @@
 from fastapi import FastAPI, UploadFile, File, HTTPException
+from fastapi.responses import FileResponse
 from fastapi.staticfiles import StaticFiles
 from secrets import token_hex
 import uvicorn
@@ -26,6 +27,14 @@ async def list_videos():
             })
     return files
 
+@app.get("/stream/{file_name}", response_class=FileResponse)
+async def stream_video(file_name: str):
+    file_path = os.path.join(video_directory, file_name)
+    if os.path.exists(file_path) and os.path.isfile(file_path):
+        return FileResponse(path=file_path, media_type='video/mp4', filename=file_name)
+    else:
+        raise HTTPException(status_code=404, detail="File not found")
+
 @app.delete("/delete/{file_name}")
 async def delete_file(file_name: str):
     file_path = os.path.join(video_directory, file_name)
@@ -38,8 +47,8 @@ async def delete_file(file_name: str):
 @app.post("/upload")
 async def upload(file: UploadFile = File(...)):
     file_ext = file.filename.split(".").pop()
-    if file_ext not in ["mp4", "avi", "MOV"]:  # Add or remove file types as needed
-        raise HTTPException(status_code=400, detail="Unsupported file type")
+    # if file_ext not in ["mp4", "avi", "mov"]:  # Add or remove file types as needed
+    #     raise HTTPException(status_code=400, detail="Unsupported file type")
 
     file_name = token_hex(10) + "." + file_ext
     file_path = os.path.join(video_directory, file_name)
